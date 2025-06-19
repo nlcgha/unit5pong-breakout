@@ -2,64 +2,86 @@
 //Nik Leung
 //3-4
 //6/9/2025
-float introX, introY;
-float introVX = 4;
-float introVY = 3;
-float introTextSize = 64;
 
-float button1X = 300;
-float button1Y = 460;
-float button2X = 300;
-float button2Y = 530;
-float buttonW = 200;
-float buttonH = 50;
+import ddf.minim.*;
 
+//boolsnvars
 int mode;
-final int INTRO = 1;
-final int GAME = 2;
-final int PAUSE = 3;
-final int GAMEOVER = 4;
+final int INTRO=0, GAME=1, PAUSE=2, GAMEOVER=3;
+boolean aiEnabled=false, hardMode=false;
 
-boolean isSinglePlayer = false;
+//titleanim
+float tx, ty, tdx=4, tdy=3;
+boolean titleColorToggle=false;
+int titleFlashCounter=0;
 
-float leftx, lefty, leftd;
-float rightx, righty, rightd;
-float ballx, bally, balld;
-float ballVX = 5;
-float ballVY = 4;
+//buttons
+float bx1=150, by1=350, bx2=150, by2=420;
+float bx3=450, by3=350, bx4=450, by4=420, bw=200, bh=50;
+float speed;
 
-float[] trailX = new float[30];
-float[] trailY = new float[30];
-int trailLength = 0;
-
-boolean wKey, sKey, upKey, downKey;
-
-int leftScore = 0;
-int rightScore = 0;
+//paddlesnball
+float ly, ry, pr, bxpos, bypos, br;
+float bvx, bvy;
+int ls, rs;
+int delayCounter=0;
+boolean waitingAfterScore = false;
 color winColor;
-boolean gameEnded = false;
+
+//paddlemvmt
+boolean wKey = false;
+boolean sKey = false;
+boolean upKey = false;
+boolean downKey = false;
+
+Minim minim;
+AudioPlayer bounceSound, clickSound;
 
 void setup() {
   size(800, 600);
+  minim = new Minim(this);
+  bounceSound = minim.loadFile("bounce.mp3", 2048);
+  clickSound  = minim.loadFile("click.mp3", 2048);
   mode = INTRO;
-  leftx = 0;
-  lefty = height/2;
-  leftd = 200;
-  rightx = width;
-  righty = height/2;
-  rightd = 200;
-  ballx = width/2;
-  bally = height/2;
-  balld = 20;
-  introX = width/2;
-  introY = height/2;
-  wKey = sKey = upKey = downKey = false;
+  tx = width/2;
+  ty = height/2;
+  resetGame();
 }
 
 void draw() {
+  //setup
+  drawBnW();
+  drawCenterLine();
+  //modeframework
   if (mode == INTRO) intro();
   else if (mode == GAME) game();
   else if (mode == PAUSE) pause();
   else if (mode == GAMEOVER) gameOver();
-  else println("errorrrrrrr");
+  else println("uhaveerror");
+}
+
+//drawingfuncts
+void drawBnW() {
+  noStroke();
+  fill(0);
+  rect(0, 0, width/2, height);
+  fill(255);
+  rect(width/2, 0, width/2, height);
+}
+
+void drawCenterLine() {
+  stroke(255);
+  strokeWeight(3);
+  line(width/2, 0, width/2, height);
+  noStroke();
+}
+
+void drawPauseSymbol() {
+  fill(255);
+  textAlign(CENTER);
+  textSize(32);
+  float px = width/2, py = height/2;
+  rect(px-10, py-20, 8, 40);
+  fill(0);
+  rect(px+2, py-20, 8, 40);
 }
